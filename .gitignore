@@ -1,8 +1,6 @@
 # Object files
 *.o
 
-
-
 # Executables
 *.out
 *.exe
@@ -22,3 +20,7 @@ main
 # Editor specifics
 .vscode/
 .idea/
+
+# Build directories
+bin/
+obj/

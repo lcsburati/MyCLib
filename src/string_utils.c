@@ -6,7 +6,7 @@
 #include "string_utils.h"
 
 
-int my_strlen(const char *str)
+int my_strlen(string str)
 {
     int length = 0;
 
@@ -18,16 +18,16 @@ int my_strlen(const char *str)
     return length;
 }
 
-char *my_tolower(const char *str)
+string my_tolower(string str)
 {
     int length = my_strlen(str);
-    char *result = malloc(sizeof(char) * (length + 1));
+    string result = malloc(sizeof(char) * (length + 1));
     if (result == NULL)
     {
         printf("Memory allocation failed\n");
         return NULL;
     }
-    char *current = result;
+    string current = result;
 
 
     while (*str)
@@ -49,16 +49,16 @@ char *my_tolower(const char *str)
     return result;
 }
 
-char *my_toupper(const char *str)
+string my_toupper(string str)
 {
     int length = my_strlen(str);
-    char *result = malloc(sizeof(char) * (length + 1));
+    string result = malloc(sizeof(char) * (length + 1));
     if (result == NULL)
     {
         printf("Memory allocation failed\n");
         return NULL;
     }
-    char *current = result;
+    string current = result;
 
     while (*str)
     {
@@ -79,7 +79,7 @@ char *my_toupper(const char *str)
     return result;
 }
 
-int my_strcmp(const char *str1, const char *str2)
+int my_strcmp(string str1, string str2)
 {
 
     int str1_length = my_strlen(str1);
@@ -113,7 +113,7 @@ int my_strcmp(const char *str1, const char *str2)
 
 }
 
-double my_strcmp_percent(const char *str1, const char *str2)
+double my_strcmp_percent(string str1, string str2)
 {
     int str1_length = my_strlen(str1);
     int str2_length = my_strlen(str2);

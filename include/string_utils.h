@@ -3,14 +3,16 @@
 
 static const int OFFSET = 'a' - 'A'; 
 
-int my_strlen(const char *str);
+typedef char * string;
 
-char *my_tolower(const char *str);
+int my_strlen(string str);
 
-char *my_toupper(const char *str);
+string my_tolower(string str);
 
-int my_strcmp(const char *str1, const char *str2);
+string my_toupper(string str);
 
-double my_strcmp_percent(const char *str1, const char *str2);
+int my_strcmp(string str1, string str2);
+
+double my_strcmp_percent(string str1, string str2);
 
 #endif
