@@ -6,9 +6,7 @@
 
 > **This project is for learning purposes only.**
 > 
-> The **backend code** (all C implementations in `src/`) was written **manually without AI assistance**, as part of my journey to deeply understand how C works under the hood.
-> 
-> The **interface** (frontend layer for visualizing and interacting with the backend) was created using AI agents. Its sole purpose is to provide a better visual experience for demonstrating backend functionality - it is **not** the focus of this project.
+> All files in `src/` and `include/` were written **manually without AI assistance**, with the **exception of `ui.h`, `ui.c`, and `main.c`**, which were created using AI agents to provide a visual interface for demonstrating the backend functionality.
 
 ---
 
@@ -16,13 +14,13 @@
 
 This project is a collection of my own implementations of libraries and algorithms, aiming to understand how things work under the hood.
 
-## How to Run
-
-You can compile the project using `gcc`:
+You can compile the project using **CMake**:
 
 ```bash
-gcc main.c -I./include -o main.out
-./main.out
+mkdir build && cd build
+cmake ..
+make
+./main
 ```
 
 ## Functions

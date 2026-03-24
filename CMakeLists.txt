@@ -48,3 +48,5 @@ else()
         target_link_libraries(main raylib m pthread dl)
     endif()
 endif()
+# Copy resources to build directory
+file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})

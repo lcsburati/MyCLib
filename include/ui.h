@@ -50,12 +50,26 @@ typedef enum {
     SECTION_MATH
 } Section;
 
-extern Font mainFont;
+// UI Life Cycle
+void InitUI(void);
+void CloseUI(void);
 
+// UI Components
 int DrawNavButton(Rectangle rec, const char *label, int isActive, float *hoverAnim);
 void DrawInputField(Rectangle rec, const char *buffer, const char *placeholder, int isFocused);
 void DrawResultCard(const char *label, const char *value, float y, Color accentColor);
 void DrawPercentageBar(float y, float width, double percent);
 void HandleTextInput(char *buffer, int *count, int maxLen);
+
+// High-level UI Layouts
+void DrawSidebar(Screen *currentScreen, char *i1, int *c1, char *i2, int *c2, char *i3, int *c3, int *activeField, float *navHover);
+
+// Screen Rendering
+void RenderStrlenPage(const char *input, int *activeField, int len);
+void RenderToLowerPage(const char *input, int *activeField, const char *result);
+void RenderToUpperPage(const char *input, int *activeField, const char *result);
+void RenderStrcmpPage(const char *i1, const char *i2, int *activeField, int cmpResult);
+void RenderStrcmpPctPage(const char *i1, const char *i2, int *activeField, double pct, int dist);
+void RenderMinPage(const char *i1, const char *i2, const char *i3, int *activeField, int result);
 
 #endif

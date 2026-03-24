@@ -6,9 +6,7 @@
 
 > **Este projeto é apenas para fins de aprendizado.**
 >
-> O **código backend** (todas as implementações em C em `src/`) foi escrito **manualmente sem assistência de IA**, como parte da minha jornada para entender profundamente como C funciona nos bastidores.
->
-> A **interface** (camada de frontend para visualização e interação com o backend) foi criada usando agentes de IA. Seu único propósito é fornecer uma melhor experiência visual para demonstrar a funcionalidade do backend - ela **não** é o foco deste projeto.
+> Todos os arquivos em `src/` e `include/` foram escritos **manualmente sem assistência de IA**, com **exceção de `ui.h`, `ui.c` e `main.c`**, que foram criados usando agentes de IA para fornecer uma interface visual para demonstrar as funcionalidades do backend.
 
 ---
 
@@ -16,13 +14,13 @@
 
 Esse projeto mostra um conjunto das minhas próprias implementações de bibliotecas e algoritmos, buscando entender como as coisas funcionam por baixo dos panos.
 
-## Como rodar
-
-Você pode compilar o projeto usando `gcc`:
+Você pode compilar o projeto usando **CMake**:
 
 ```bash
-gcc main.c -I./include -o main.out
-./main.out
+mkdir build && cd build
+cmake ..
+make
+./main
 ```
 
 ## Funções
