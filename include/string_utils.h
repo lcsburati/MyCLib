@@ -4,7 +4,7 @@
 
 
 /*Constants*/
-#define OFFSET ('a' - 'A'); 
+#define OFFSET ('a' - 'A')
 #define STR_BUFFER 256
 
 /*Structs*/

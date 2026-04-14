@@ -153,7 +153,13 @@ void RenderStrlenPage(const char *input, int *activeField, int len) {
     Rectangle field = { CONTENT_X, 118, CONTENT_W, INPUT_H };
     DrawInputField(field, input, "Type something...", *activeField == 1);
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), field)) *activeField = 1;
-    DrawResultCard("Length", TextFormat("%d characters", len), 200, ACCENT);
+    
+    if (input[0] == '\0') {
+        DrawResultCard("Length", "Empty input (0)", 200, ORANGE_WARN);
+    } else {
+        DrawResultCard("Length", TextFormat("%d characters", len), 200, ACCENT);
+    }
+    
     float barY = 300;
     DrawTextEx(mainFont, "Character count", (Vector2){ (float)CONTENT_X, barY }, FONT_SIZE_XS, 1, TEXT_SECONDARY);
     barY += 20;
@@ -171,7 +177,11 @@ void RenderToLowerPage(const char *input, int *activeField, const char *result) 
     Rectangle field = { CONTENT_X, 118, CONTENT_W, INPUT_H };
     DrawInputField(field, input, "TYPE SOMETHING HERE...", *activeField == 1);
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), field)) *activeField = 1;
-    DrawResultCard("Result", result, 200, GREEN_OK);
+    if (result[0] == '\0' && input[0] != '\0') {
+        DrawResultCard("Result", "NULL input detected", 200, RED_ERR);
+    } else {
+        DrawResultCard("Result", result[0] != '\0' ? result : "(empty)", 200, GREEN_OK);
+    }
 }
 
 void RenderToUpperPage(const char *input, int *activeField, const char *result) {
@@ -180,7 +190,11 @@ void RenderToUpperPage(const char *input, int *activeField, const char *result) 
     Rectangle field = { CONTENT_X, 118, CONTENT_W, INPUT_H };
     DrawInputField(field, input, "type something here...", *activeField == 1);
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), field)) *activeField = 1;
-    DrawResultCard("Result", result, 200, ACCENT);
+    if (result[0] == '\0' && input[0] != '\0') {
+        DrawResultCard("Result", "NULL input detected", 200, RED_ERR);
+    } else {
+        DrawResultCard("Result", result[0] != '\0' ? result : "(empty)", 200, ACCENT);
+    }
 }
 
 void RenderStrcmpPage(const char *i1, const char *i2, int *activeField, int cmpResult) {
@@ -195,9 +209,40 @@ void RenderStrcmpPage(const char *i1, const char *i2, int *activeField, int cmpR
         if (CheckCollisionPointRec(GetMousePosition(), f1)) *activeField = 1;
         if (CheckCollisionPointRec(GetMousePosition(), f2)) *activeField = 2;
     }
-    const char *msg = (cmpResult == 0) ? "EQUAL (0)" : (cmpResult < 0 ? "String 1 < String 2" : "String 1 > String 2");
-    Color col = (cmpResult == 0) ? GREEN_OK : (cmpResult < 0 ? ORANGE_WARN : RED_ERR);
-    DrawResultCard("Comparison Result", msg, 288, col);
+
+    int len1 = my_strlen(i1);
+    int len2 = my_strlen(i2);
+    int empty1 = (i1[0] == '\0');
+    int empty2 = (i2[0] == '\0');
+    int bothEmpty = empty1 && empty2;
+    int oneEmpty = empty1 != empty2;
+    int sameLen = (len1 == len2);
+
+    if (bothEmpty) {
+        DrawTextEx(mainFont, "Length: S1=0 | S2=0 | SAME SIZE", (Vector2){ (float)CONTENT_X, 280 }, FONT_SIZE_XS, 1, ORANGE_WARN);
+        DrawResultCard("Comparison Result", "EMPTY INPUTS - EQUAL (0)", 308, GREEN_OK);
+    } else if (oneEmpty) {
+        const char *sizeLabel = empty1 ? "S1 EMPTY" : "S2 EMPTY";
+        DrawTextEx(mainFont, TextFormat("Length: S1=%d | S2=%d | %s", len1, len2, sizeLabel), (Vector2){ (float)CONTENT_X, 280 }, FONT_SIZE_XS, 1, RED_ERR);
+        DrawResultCard("Comparison Result", empty1 ? "S2 GREATER (1)" : "S1 GREATER (1)", 308, RED_ERR);
+    } else {
+        const char *sizeLabel = sameLen ? "SAME SIZE" : "DIFFERENT SIZES";
+        DrawTextEx(mainFont, TextFormat("Length: S1=%d | S2=%d | %s", len1, len2, sizeLabel), (Vector2){ (float)CONTENT_X, 280 }, FONT_SIZE_XS, 1, sameLen ? ORANGE_WARN : TEXT_MUTED);
+
+        const char *msg;
+        Color col;
+        if (cmpResult == 0) {
+            msg = "EQUAL (0)";
+            col = GREEN_OK;
+        } else if (cmpResult > 0) {
+            msg = sameLen ? "DIFFERENT - S1 > S2 (1)" : "S1 GREATER LENGTH (1)";
+            col = RED_ERR;
+        } else {
+            msg = "S1 < S2 (-1)";
+            col = ORANGE_WARN;
+        }
+        DrawResultCard("Comparison Result", msg, 308, col);
+    }
 }
 
 void RenderStrcmpPctPage(const char *i1, const char *i2, int *activeField, double pct, int dist) {
@@ -212,9 +257,20 @@ void RenderStrcmpPctPage(const char *i1, const char *i2, int *activeField, doubl
         if (CheckCollisionPointRec(GetMousePosition(), f1)) *activeField = 1;
         if (CheckCollisionPointRec(GetMousePosition(), f2)) *activeField = 2;
     }
-    DrawResultCard("Similarity", TextFormat("%.1f%% match", pct), 288, (pct >= 80.0 ? GREEN_OK : (pct >= 50.0 ? ORANGE_WARN : RED_ERR)));
-    DrawPercentageBar(388, CONTENT_W, pct);
-    DrawTextEx(mainFont, TextFormat("Edit distance: %d operations", dist), (Vector2){ (float)CONTENT_X, 434 }, FONT_SIZE_XS, 1, TEXT_MUTED);
+
+    int empty1 = (i1[0] == '\0');
+    int empty2 = (i2[0] == '\0');
+    int bothEmpty = empty1 && empty2;
+
+    if (bothEmpty) {
+        DrawResultCard("Similarity", "Empty inputs (100%)", 288, ORANGE_WARN);
+        DrawPercentageBar(388, CONTENT_W, 100.0);
+        DrawTextEx(mainFont, "Edit distance: 0 operations", (Vector2){ (float)CONTENT_X, 434 }, FONT_SIZE_XS, 1, TEXT_MUTED);
+    } else {
+        DrawResultCard("Similarity", TextFormat("%.1f%% match", pct), 288, (pct >= 80.0 ? GREEN_OK : (pct >= 50.0 ? ORANGE_WARN : RED_ERR)));
+        DrawPercentageBar(388, CONTENT_W, pct);
+        DrawTextEx(mainFont, TextFormat("Edit distance: %d operations", dist), (Vector2){ (float)CONTENT_X, 434 }, FONT_SIZE_XS, 1, TEXT_MUTED);
+    }
 }
 
 void RenderMinPage(const char *i1, const char *i2, const char *i3, int *activeField, int result) {
