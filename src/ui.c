@@ -14,7 +14,7 @@ static int sectionStarts[] = { 0, 5 };
 
 void InitUI(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(WIN_W, WIN_H, "MyCLib - C Libraries");
+    InitWindow(WIN_W, WIN_H, "MyCLab - C Libraries");
     SetTargetFPS(60);
     mainFont = LoadFontEx("resources/font.ttf", 96, 0, 0);
     SetTextureFilter(mainFont.texture, TEXTURE_FILTER_BILINEAR);
@@ -112,7 +112,7 @@ void HandleTextInput(char *buffer, int *count, int maxLen) {
 void DrawSidebar(Screen *currentScreen, char *i1, int *c1, char *i2, int *c2, char *i3, int *c3, int *activeField, float *navHover) {
     DrawRectangle(0, 0, SIDEBAR_W, WIN_H, BG_SIDEBAR);
     DrawRectangle(SIDEBAR_W - 1, 0, 1, WIN_H, DIVIDER);
-    DrawTextEx(mainFont, "MyCLib", (Vector2){ 20, 20 }, 22, 1, TEXT_PRIMARY);
+    DrawTextEx(mainFont, "MyCLab", (Vector2){ 20, 20 }, 22, 1, TEXT_PRIMARY);
     DrawTextEx(mainFont, "C Libraries", (Vector2){ 20, 46 }, 12, 1, TEXT_SECONDARY);
     DrawRectangle(20, 70, SIDEBAR_W - 40, 1, DIVIDER);
 

@@ -16,6 +16,9 @@ Reports ordered by creation/modification date and time:
 4. 2026-05-04 20:32:21
    audits/2026-05-04_20-32-21_current_audit_report.txt
 
+5. 2026-06-04 16:06:00
+   audits/2026-06-04_16-06-00_full_audit_report.txt
+
 Naming rule for new reports:
 
   YYYY-MM-DD_HH-MM-SS_short-description.txt

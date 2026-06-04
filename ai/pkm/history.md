@@ -34,7 +34,7 @@ The project evolved in distinct phases:
 - READMEs in 3 languages
 - Improved string validation
 - Commits: `43db9c5`, `920b3bc`
-- MIT License, TODO.md, improved buffer handling
+- MIT License, PKM notes, improved buffer handling
 - Commit: `74ca5d7` (HEAD)
 
 ### Phase 7 - Audit (current)

@@ -1,4 +1,4 @@
-# MyClab
+# MyCLab
 
 [English](README.md) | [Português](README.pt-br.md) | [中文版](README.zh-cn.md)
 
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-**Purpose:** The project aims to understand the behavior of the C language through simulations of some libraries, based on my interpretation of how they should work, not necessarily how they actually work. The goal is to achieve similar results using my current knowledge, focusing on understanding the language syntax, its primitive and derived data structures, among other aspects. The purpose is to truly understand how low-level languages work, understanding the abstractions that happen behind the scenes. Additionally, I want to deepen my knowledge and practice my logical reasoning to improve the way I solve problems.
+**Purpose:** The project aims to understand the behavior of the C language through simulations of some libraries, based on my interpretation. The idea is to achieve similar results using my current knowledge, focusing on understanding the language syntax, its data structures, among other aspects. The purpose is to truly understand how low-level languages work (in this case, C), understanding the abstractions that happen behind the scenes. Additionally, I want to deepen my knowledge and practice my logical reasoning to improve the way I solve problems.
 
 ## How to compile (CMake)
 
@@ -57,7 +57,7 @@ We start by defining the variable that will count the string (array) length, nam
 
 The logic from there is simple: knowing that every string in C ends with the null character `\0`, we can traverse the string until we find it. This character is interpreted as `0` or `false` (since booleans do not exist natively in C), so we can simply use `while (*str)` to indicate to the program that it should traverse the pointer starting at the input string until it finds the `\0`. With each loop iteration, we increment `length` by 1, accumulating the string size.
 
-**Invalid input check:** The function verifies if the string is `NULL`; if so, it immediately returns `0`. Additionally, if during iteration the length reaches or exceeds `STR_BUFFER`, the function returns `0` to prevent _overflows_ or unwanted wait times — it is a good security practice.
+**Invalid input and overflow check:** The function verifies if the string is `NULL`; if so, it immediately returns `0`. Additionally, if during iteration the length reaches or exceeds `STR_BUFFER`, the function returns `STR_BUFFER + 1`. I did this to differentiate an error/overflow from a valid count, since returning `0` could also represent an empty string. The `+ 1` helps handle edge cases and makes it clearer to the functions that depend on `my_strlen` that the size went past the expected limit.
 
 **OBS:** The function recognizes spaces (` `) as a character as well. That is, if you pass a string with spaces, the returned size will be the total string size, including spaces. I think it's important to mention this, because depending on the context some functions/approaches treat space as a separator and end up "ignoring" this character (for example, when reading input with `scanf("%s")`).
 
@@ -88,7 +88,7 @@ The conversion logic traverses the input string (`str`): we check if the current
 
 At the end of the loop, we set the last character of `current` to `\0`, correctly terminating the string. We return `result`, which points to the beginning of the new string now in **UPPERCASE**.
 
-**Empty input check:** The function verifies if the string length is 0; if so, it returns `NULL` to avoid unnecessary allocations and make it clear there are no characters to convert.
+**Empty input or buffer limit check:** The function verifies if the string length is `0` or greater than `STR_BUFFER`; if so, it returns `NULL` to avoid unnecessary allocations and also prevent a string marked as overflow by `my_strlen` from continuing into allocation.
 
 </details>
 
@@ -101,7 +101,7 @@ The fundamental difference lies in the conversion logic: we traverse the input s
 
 As with other functions, we maintain security by checking the success of memory allocation. At the end, we ensure the string is terminated with the null character `\0` and return the `result` pointer, which points to the beginning of the new string converted to **lowercase**.
 
-**Empty input check:** The function verifies if the string length is 0; if so, it returns `NULL` to avoid unnecessary allocations and make it clear there are no characters to convert.
+**Empty input or buffer limit check:** The function verifies if the string length is `0` or greater than `STR_BUFFER`; if so, it returns `NULL` to avoid unnecessary allocations and also prevent a string marked as overflow by `my_strlen` from continuing into allocation.
 
 </details>
 
@@ -118,6 +118,13 @@ When the loop ends, we return the difference between the current characters one 
 
 The return expressions use a type cast to `unsigned char` because we are using `char` values inside integer operations. Depending on the compiler, plain `char` can be interpreted as signed or unsigned, which can affect characters outside the basic ASCII table. By converting to `unsigned char`, the comparison becomes more predictable and closer to the expected behavior of `strcmp`.
 
+**Return codes:**
+
+- `0`: the strings are equal.
+- Negative value: the first different character in `str1` is smaller than the one in `str2`.
+- Positive value: the first different character in `str1` is greater than the one in `str2`.
+- `1` during the initial check: at least one input is `NULL`.
+
 </details>
 
 <details>
@@ -125,7 +132,11 @@ The return expressions use a type cast to `unsigned char` because we are using `
 
 The input parameters are `str1` and `str2`, similar to `my_strcmp`. The main difference lies in the algorithm: to calculate the similarity percentage, we use the **Levenshtein distance**, which fills a matrix based on the minimum number of operations needed to transform `str2` into `str1` — these operations being: **insertion**, **substitution**, and **deletion** of characters.
 
-The algorithm starts by defining the sizes of `str1` and `str2`, then allocates the `matrix` on the heap — treated as a double pointer (`int**`) — using `malloc` for both rows and columns via for loop.
+The algorithm starts by defining the sizes of `str1` and `str2` using `my_strlen`. Since `my_strlen` now returns `STR_BUFFER + 1` when it detects overflow, `my_strcmp_percent` uses that information to stop before trying to build the Levenshtein matrix with an invalid size.
+
+Before moving to the main calculation, the function handles a few special return values: if either input is `NULL`, it returns `-3`; if either string goes past `STR_BUFFER`, it returns `-2`; and if any memory allocation fails, it returns `-1`.
+
+After these checks, the function allocates the `matrix` on the heap — treated as a double pointer (`int**`) — using `malloc` for both rows and columns via for loop. There is also a protection for failure in the middle of row allocation: if any column cannot be allocated, the function frees everything that had already been reserved before returning the error, preventing memory leaks.
 
 The first two loops after allocation define the **matrix borders**: the left border (column 0) and the top border (row 0) are filled with increasing values, representing the cost of starting from zero — that is, how many operations would be needed if one of the strings were empty.
 
@@ -139,8 +150,18 @@ Then, we take the **minimum among the 3 operations** — because we want the pat
 
 With the complete loop, the matrix is fully filled and the value at `matrix[str1_length][str2_length]` is the final accumulated distance of all operations.
 
-From there, we use a ternary conditional to identify which string is larger and use its size as the denominator in the percentage calculation. Finally, we free the allocated matrix space and return the similarity as `double`.
+From there, we use a ternary conditional to identify which string is larger and use its size as the denominator in the percentage calculation. If both strings are empty, that denominator becomes `0`; in that case, the function frees the matrix and returns `-4`, avoiding division by zero. Finally, in the normal flow, we free the allocated matrix space and return the similarity as `double`.
 
-**Empty input check:** The function verifies if either string has length 0. If one or both are empty, it returns 1 (or 100% similarity if both are empty), covering edge cases of invalid input.
+**Return codes:**
+
+- `0` to `100`: similarity percentage calculated successfully.
+- `-1`: matrix memory allocation failed.
+- `-2`: at least one string went past `STR_BUFFER`, indicating overflow detected by `my_strlen`.
+- `-3`: at least one input is `NULL`.
+- `-4`: both strings are empty, leaving the calculation denominator equal to `0`.
+
+**OBS about empty strings:** Since an empty string does not go past `STR_BUFFER`, one empty string compared with another string that has content can still continue to the calculation and tends to return `0%`. The case where both strings are empty is handled separately with `-4`, because there is no maximum length to use as the percentage base.
+
+**OBS:** The error codes are now negative exactly to avoid confusing them with valid percentages. Since the normal return stays between `0` and `100`, any negative value means the function stopped before the final calculation.
 
 </details>

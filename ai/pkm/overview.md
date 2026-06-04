@@ -40,4 +40,4 @@ An educational C99 project that recreates standard C library functions (string.h
 ## Documentation
 
 - README in 3 languages: English, Portuguese (BR) and Simplified Chinese
-- TODO.md with known bugs and future work
+- PKM notes with known bugs, technical debt and future work

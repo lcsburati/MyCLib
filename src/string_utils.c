@@ -20,7 +20,8 @@ size_t my_strlen(string str)
     {
         if (length >= STR_BUFFER)
         {
-            return 0;
+            /*Differentiates an error from the buffer count*/
+            return STR_BUFFER + 1; /*+ 1 to handle edge cases and avoid possible bugs*/
         }
 
         length++, str++;
@@ -38,7 +39,7 @@ string my_toupper(string str)
 
     size_t length = my_strlen(str);
 
-    if (length == 0)
+    if (length == 0 || length > STR_BUFFER)
     {
         return NULL;
     }
@@ -79,7 +80,7 @@ string my_tolower(string str)
 
     size_t length = my_strlen(str);
 
-    if (length == 0)
+    if (length == 0 || length > STR_BUFFER)
     {
         return NULL;
     }
@@ -137,25 +138,48 @@ int my_strcmp(string str1, string str2)
 
 
 double my_strcmp_percent(string str1, string str2)
-{
+{   
     if (str1 == NULL || str2 == NULL)
     {
-        return 1;
+        return -3;
     }
 
     /*Variables*/
     size_t str1_length = my_strlen(str1);
     size_t str2_length = my_strlen(str2);
     
-    if (str1_length == 0 || str2_length == 0)
+    /*Kept to check possible issues in my_strlen*/
+    if (str1_length > STR_BUFFER || str2_length > STR_BUFFER)
     {
-        return 1;
+        return -2;
     }
 
     /*Heap Space Allocation*/
     int **matrix = malloc((str1_length + 1) * sizeof(int*));
+
+    /*Checking if space is allocated for each row*/
+    if (matrix == NULL)
+    {
+        return -1;
+    }
+    
     for (int i = 0; i <= str1_length; i++) {
         matrix[i] = malloc((str2_length + 1) * sizeof(int));
+
+        /*Cheking if space is allocated for each column*/
+        if (matrix[i] == NULL)
+        {
+            /*If the failure happens after some memory slots have already been allocated*/
+            for (int k = 0; k < i; k++)
+            {
+                free(matrix[k]);
+            }
+
+            free(matrix);
+
+            return -1;
+        }
+
     }
 
     /*Border Definitions*/
@@ -181,7 +205,14 @@ double my_strcmp_percent(string str1, string str2)
     int distance = matrix[str1_length][str2_length];
     int max_len = (str1_length > str2_length) ? str1_length : str2_length;
     
-    if (max_len == 0) return 100.0;
+    if (max_len == 0) {
+
+        for (int i = 0; i <= str1_length; i++) {
+            free(matrix[i]);
+        }
+        free(matrix);
+        return -4;
+    } 
     
     double percent = 100.0 * (1.0 - (double)distance / max_len);
 

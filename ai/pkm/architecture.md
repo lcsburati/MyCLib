@@ -57,7 +57,7 @@ main.c (entry point)
 1. **Separation of concerns** - Backend (string_utils, math_utils) is independent from the UI
 2. **Memory ownership** - my_toupper/my_tolower return heap-allocated strings; the caller must free()
 3. **Buffer protection** - Max size validation (STR_BUFFER = 256) in core functions
-4. **Error handling** - Returns NULL for invalid pointers, 0 for strlen on error
+4. **Error handling** - Uses simple sentinel values: NULL for failed string allocations/conversions, `STR_BUFFER + 1` for strlen overflow, and negative codes for `my_strcmp_percent` errors
 
 ## Main Flow
 

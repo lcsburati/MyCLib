@@ -26,11 +26,12 @@
 
 ## 7. STR_BUFFER = 256 as a global limit
 - **Reason:** Prevent buffer overflow; simple and predictable limit
-- **Trade-off:** Limits functionality; larger strings are silently rejected
+- **Trade-off:** Limits functionality; larger strings are rejected through explicit sentinel/error handling
 
-## 8. my_strlen returning 0 as error sentinel
-- **Reason:** Simplicity - no result structs or elaborate error codes
-- **Trade-off:** Ambiguity - 0 can mean empty string OR error (NULL, overflow)
+## 8. my_strlen sentinel values
+- **Reason:** Keep the return type as `size_t` while still signaling simple invalid states
+- **Current behavior:** `NULL` returns `0`; reaching the buffer limit returns `STR_BUFFER + 1`
+- **Trade-off:** `0` still overlaps with empty string for `NULL`, but overflow is now distinguishable from an empty input
 
 ## 9. CMake as build system
 - **Reason:** Replaced Makefile for better cross-platform portability
@@ -39,3 +40,8 @@
 ## 10. README in 3 languages
 - **Reason:** Accessibility; international portfolio
 - **Languages:** English (main), Portuguese BR, Simplified Chinese
+
+## 11. Negative error codes in my_strcmp_percent
+- **Reason:** Keep valid similarity percentages in the `0` to `100` range while separating backend errors
+- **Current behavior:** `-1` allocation failure, `-2` overflow detected through `my_strlen`, `-3` NULL input, `-4` both strings empty
+- **Trade-off:** The function still mixes status and numeric result in a `double`; a result struct would be cleaner but more complex for the current learning stage
